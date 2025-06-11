@@ -1,0 +1,7 @@
+---
+- id: helm-update-dependencies
+  name: Update Helm Dependencies
+  entry: bash hooks/helm/checks-dependencies.sh
+  language: system
+  types: [yaml]
+  files: ^(.*\/)?Chart\.yaml$
