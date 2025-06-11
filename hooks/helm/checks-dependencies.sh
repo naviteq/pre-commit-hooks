@@ -5,13 +5,13 @@ set -e
 CHART_ARG="$1"
 
 if [ -z "$CHART_ARG" ]; then
-  echo "🔍 Auto-detecting changed Helm charts from git..."
-  CHART_ARG=$(git diff --cached --name-only | grep -E '(^|/)Chart\.yaml$' | xargs -n1 dirname | paste -sd, -)
-  if [ -z "$CHART_ARG" ]; then
-    echo "✅ No changed charts detected, skipping"
-    exit 0
-  fi
-  echo "📦 Charts to update: $CHART_ARG"
+    echo "🔍 Auto-detecting changed Helm charts from git..."
+    CHART_ARG=$(git diff --cached --name-only | grep -E '(^|/)Chart\.yaml$' | xargs -n1 dirname | paste -sd, -)
+    if [ -z "$CHART_ARG" ]; then
+        echo "✅ No changed charts detected, skipping"
+        exit 0
+    fi
+    echo "📦 Charts to update: $CHART_ARG"
 fi
 
 # Temporary files
@@ -84,6 +84,15 @@ else
     echo "🟢 Processing chart(s): $CHART_ARG"
     IFS=',' read -r -a TARGET_CHARTS <<< "$CHART_ARG"
     for chart_path in "${TARGET_CHARTS[@]}"; do
+        # Normalize Chart.yaml file → folder if needed
+        if [[ "$chart_path" == */Chart.yaml ]]; then
+            chart_path=$(dirname "$chart_path")
+        fi
+        # Normalize relative path to absolute
+        if [[ "$chart_path" != /* ]]; then
+            chart_path="$PWD/$chart_path"
+        fi
+
         if [ ! -d "$chart_path" ]; then
             echo "❌ Chart folder '$chart_path' not found."
             exit 1

@@ -2,6 +2,6 @@
 - id: helm-update-dependencies
   name: Update Helm Dependencies
   entry: hooks/helm/checks-dependencies.sh
-  language: system
-  types: [yaml]
+  language: script
   files: ^(.*\/)?Chart\.yaml$
+  require_serial: true
