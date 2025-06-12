@@ -2,12 +2,12 @@
 
 set -e
 
-CHART_ARG="$1"
+CHART_ARG=( "$@" )
 
-if [ -z "$CHART_ARG" ]; then
+if [ -z "${CHART_ARG[*]}" ]; then
     echo "🔍 Auto-detecting changed Helm charts from git..."
     CHART_ARG=$(git diff --cached --name-only | grep -E '(^|/)Chart\.yaml$' | xargs -n1 dirname | paste -sd, -)
-    if [ -z "$CHART_ARG" ]; then
+    if [ -z "${CHART_ARG[*]}" ]; then
         echo "✅ No changed charts detected, skipping"
         exit 0
     fi
@@ -74,7 +74,7 @@ visit_downward() {
     done
 }
 
-if [ -z "$CHART_ARG" ]; then
+if [ -z "${CHART_ARG[*]}" ]; then
     echo "🟡 No chart specified — processing all charts"
     # shellcheck disable=SC2013
     for chart_abs in $(cut -d':' -f1 "$TMP_PATHMAP"); do
@@ -82,7 +82,7 @@ if [ -z "$CHART_ARG" ]; then
     done
 else
     echo "🟢 Processing chart(s): $CHART_ARG"
-    IFS=',' read -r -a TARGET_CHARTS <<< "$CHART_ARG"
+    IFS=' ' read -r -a TARGET_CHARTS <<< "$CHART_ARG"
     for chart_path in "${TARGET_CHARTS[@]}"; do
         # Normalize Chart.yaml file → folder if needed
         if [[ "$chart_path" == */Chart.yaml ]]; then
