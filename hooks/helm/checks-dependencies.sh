@@ -81,8 +81,8 @@ if [ -z "${CHART_ARG[*]}" ]; then
         visit_downward "$chart_abs"
     done
 else
-    echo "🟢 Processing chart(s): $CHART_ARG"
-    IFS=' ' read -r -a TARGET_CHARTS <<< "$CHART_ARG"
+    echo "🟢 Processing chart(s): ${CHART_ARG[*]}"
+    IFS=' ' read -r -a TARGET_CHARTS <<< "${CHART_ARG[*]}"
     for chart_path in "${TARGET_CHARTS[@]}"; do
         # Normalize Chart.yaml file → folder if needed
         if [[ "$chart_path" == */Chart.yaml ]]; then
