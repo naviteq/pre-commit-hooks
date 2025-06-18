@@ -4,18 +4,18 @@ set -e
 
 CHART_ARG=( "$@" )
 
-if [ -z "${CHART_ARG[*]}" ]; then
-    echo "🔍 Auto-detecting changed Helm charts from git..."
-    CHART_ARG=$(git diff --cached --name-only | grep -E '(^|/)Chart\.yaml$' | xargs -n1 dirname | paste -sd, -)
+if [ -n "${FORCE_UPDATE_CHART}" ]; then
+    CHART_ARG=("${FORCE_UPDATE_CHART}")
+else
     if [ -z "${CHART_ARG[*]}" ]; then
-        if [ -n "${FORCE_UPDATE_CHART}" ]; then
-            CHART_ARG="${FORCE_UPDATE_CHART}"
-        else
+        echo "🔍 Auto-detecting changed Helm charts from git..."
+        CHART_ARG=$(git diff --cached --name-only | grep -E '(^|/)Chart\.yaml$' | xargs -n1 dirname | paste -sd, -)
+        if [ -z "${CHART_ARG[*]}" ]; then
             echo "✅ No changed charts detected, skipping"
             exit 0
         fi
+        echo "📦 Charts to update: $CHART_ARG"
     fi
-    echo "📦 Charts to update: $CHART_ARG"
 fi
 
 # Temporary files
